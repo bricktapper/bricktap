@@ -21,6 +21,10 @@ export const getTime = createSelector(
     (time) => time
 )
 
+export const getCurrentTime = createSelector(
+    (state: RootState) => state.app.current_time,
+    (current_time) => current_time
+)
 export const getEnergy = createSelector(
     (state: RootState) => state.app.energy,
     (balance) => balance

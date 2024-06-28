@@ -4,6 +4,7 @@ export interface Store {
     balance: number | null
     energy: number | null
     time: number | null
+    current_time: number | null
     infoData: InfoData
     tasksPage: TasksData
     shopPage: InventoryPage
@@ -52,6 +53,7 @@ export interface InfoData {
     damage?: number
     energy?: number
     time: number
+    current_time: number
     equipped?: string[]
 }
 

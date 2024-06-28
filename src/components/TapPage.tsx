@@ -2,7 +2,7 @@ import { FC, useEffect, useState, useMemo, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Typography, CircularProgress } from '@mui/material';
 import styled from 'styled-components';
-import { getEnergy, getId, getInfo, getTime } from '../store/app/selectors';
+import { getCurrentTime, getEnergy, getId, getInfo, getTime } from '../store/app/selectors';
 import { fetchInfo, getTap } from '../store/app/async-actions';
 import { processEnergy } from '../helpers';
 import usePreloadImages from '../hooks/usePreloadImages'; // Assuming this is a custom hook for image preloading
@@ -12,16 +12,15 @@ import fullimage from '../images/mainPage/energy/0energy.png';
 
 const formatTime = (seconds: number) => {
   if (seconds <= 0) {
-    return ''; // Либо любое другое значение, которое вы хотите отображать, когда время истекло
+    return '00:00:00'; // Либо любое другое значение, которое вы хотите отображать, когда время истекло
   }
 
   const absSeconds = Math.abs(seconds);
   const hours = Math.floor(absSeconds / 3600).toString().padStart(2, '0');
   const minutes = Math.floor((absSeconds % 3600) / 60).toString().padStart(2, '0');
-  const secs = (absSeconds % 60).toString().padStart(2, '0'); // Добавляем секунды
+  const secs = (absSeconds % 60).toString().padStart(2, '0'); // Правильное форматирование секунд
 
-  const formattedTime = `${hours}:${minutes}:${secs}`;
-  return formattedTime;
+  return `${hours}:${minutes}:${secs}`;
 };
 
 export const TapPage: FC = () => {
@@ -30,17 +29,15 @@ export const TapPage: FC = () => {
   const energy = useSelector(getEnergy);
   const data = useSelector(getInfo);
   const time = useSelector(getTime) || 0;
+  const serverCurrentTime = useSelector(getCurrentTime);
   const [isClicked, setIsClicked] = useState(false);
   const [energyImage, setEnergyImage] = useState(fullimage);
   const [equippedImages, setEquippedImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(true); 
 
-  const cd = new Date();
-  const newD = cd.setMinutes(cd.getMinutes() + cd.getTimezoneOffset());
-  const [currentTime, setCurrentTime] = useState<number>(newD); 
+  const [currentTime, setCurrentTime] = useState<number>(0); // Изначально установите в 0
 
   const energyHandled = useMemo(() => energy ? processEnergy(energy) : 0, [energy]);
-  console.log(energy)
 
   const getEnergyImagePath = useCallback(async (energyHandled: number) => {
     try {
@@ -97,25 +94,28 @@ export const TapPage: FC = () => {
   }, []);
 
   useEffect(() => {
+    // Установите текущее время с сервера
+    const initialCurrentTime = Date.now() / 1000; // Текущее время на клиенте в секундах
+    const serverTimeDifference = initialCurrentTime - serverCurrentTime;
+    setCurrentTime(serverCurrentTime + serverTimeDifference);
+
     const interval = setInterval(() => {
-      setCurrentTime(prevTime => prevTime + 1000);
+      setCurrentTime(currentTime => currentTime + 1); // Обновляем каждую секунду
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [serverCurrentTime]);
 
   // Set energy image when energy changes
   useEffect(() => {
     const updateEnergyImage = () => {
-     
-        getEnergyImagePath(energyHandled).then(imagePath => setEnergyImage(imagePath));
-     
+      getEnergyImagePath(energyHandled).then(imagePath => setEnergyImage(imagePath));
     };
-  
+
     updateEnergyImage(); // Обновляем изображение при первой загрузке
-  
+
     const interval = setInterval(updateEnergyImage, 180000); // Устанавливаем интервал на 3 минуты
-  
+
     return () => clearInterval(interval); // Очищаем интервал при размонтировании компонента
   }, [energy, energyHandled, getEnergyImagePath]);
 
@@ -139,10 +139,11 @@ export const TapPage: FC = () => {
         setIsClicked(false);
       }, 100);
     }
-  }, [energy, tg_id]);
+  }, [energy, tg_id, dispatch]);
 
   // Вычисляем оставшееся время в секундах
-  const remainingSeconds = Math.floor((time - currentTime / 1000));
+  const remainingSeconds = Math.max(time - Math.floor(currentTime), 0);
+  console.log(time, currentTime, remainingSeconds);
 
   if (loading) {
     return (
@@ -151,6 +152,7 @@ export const TapPage: FC = () => {
       </LoadingContainer>
     );
   }
+
   return (
     <MainContainer>
       <Container className={isClicked ? 'clicked' : ''}>
