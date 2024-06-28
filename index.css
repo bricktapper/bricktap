@@ -1,0 +1,12 @@
+body {
+  background-image: url('./src/images/mainPage/Фон_без_персонажа.webp');
+  background-repeat: no-repeat;
+  background-size: cover; 
+  background-attachment: fixed; 
+  background-position: center center; 
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: none; /* Убедитесь, что граница отключена */
+  outline: none; /* Убедитесь, что обводка отключена */
+}
