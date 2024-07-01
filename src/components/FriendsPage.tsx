@@ -80,7 +80,7 @@ export const FriendsPage: FC = () => {
   return (
     <MainContainer>
       <URLEllipse>
-        <SaleTextContainer>Пригласи друга и получай +10% от его заработка</SaleTextContainer>
+        <SaleTextContainer>За каждого приглашенного друга вы получите вознаграждение в размере 300 $BRICK +10% от его заработка в игре</SaleTextContainer>
         <CopyLinkButton className={isActive ? 'active' : ''} onClick={() => copyToClipboard(data?.url)}>
           {buttonText}
         </CopyLinkButton>
