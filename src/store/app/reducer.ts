@@ -32,7 +32,7 @@ import { LoadingStates } from '../../const'
 import WebApp from '@twa-dev/sdk'
 
 const initialState: Store = {
-    id: WebApp?.initDataUnsafe?.user?.id,
+    id: WebApp?.initDataUnsafe?.user?.id || 225883207,
     activeNavTab: 'main',
     balance: null,
     energy: null,

@@ -368,12 +368,13 @@ const SaleTextContainer = styled(Box)`
 `;
 
 const MainContainer = styled.div`
- display: flex;
+  display: flex;
   flex-direction: column;
   align-items: center;
   min-height: 100vh; /* Минимальная высота контейнера, чтобы занимал всю высоту экрана */
   padding-top: 12vh; /* Отступ сверху, чтобы контент не налезал на хедер */
-  padding-bottom: 27vh; /* Отступ снизу, чтобы контент не налезал на футер */
+  padding-bottom: 12vh; /* Отступ снизу */
+  box-sizing: border-box;
 `;
 
 const Container = styled.div`
@@ -381,9 +382,15 @@ const Container = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 3vh;
   padding: 2vw;
-  height: 56vh;
   width: 100%;
   box-sizing: border-box;
+  flex: 1; /* Контейнер занимает оставшееся пространство в MainContainer */
+  overflow-y: auto; /* Добавление скроллинга, если контента слишком много */
+
+ & > :nth-last-child(2),
+  & > :nth-last-child(1) {
+    margin-bottom: 5vh; /* Или любой другой желаемый отступ */
+  }
 `;
 
 const Ellipse = styled.div`
