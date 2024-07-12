@@ -123,7 +123,15 @@ export const TapPage: FC = () => {
   useEffect(() => {
     const loadEquippedImages = async () => {
       if (data?.equipped) {
-        const images = await Promise.all(data.equipped.map(fileName => getEquippedImagePath(fileName)));
+        const images = await Promise.all(
+          data.equipped.map(async (fileName) => {
+            const url = await getEquippedImagePath(fileName);
+            return {
+              url,
+              zIndex: fileName.includes('head') ? 0 : 1,
+            };
+          })
+        );
         setEquippedImages(images);
       }
     };
@@ -159,7 +167,7 @@ export const TapPage: FC = () => {
         <OverlayContainer>
           <CharacterImage src={imgg} />
           {equippedImages.map((image, index) => (
-            <OverlayImage key={index} src={image} />
+            <OverlayImage key={index} src={image.url} zIndex={image.zIndex} />
           ))}
         </OverlayContainer>
         <CenteredButton onClick={handleClick}></CenteredButton>
@@ -299,6 +307,7 @@ const OverlayImage = styled.img`
   outline: none;
   box-shadow: none;
   pointer-events: none; /* To ensure the images don't interfere with click events */
+  z-index: ${(props) => props.zIndex}; /* Use zIndex prop */
 `;
 
 const CenteredButton = styled.button`
