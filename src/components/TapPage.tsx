@@ -128,7 +128,7 @@ export const TapPage: FC = () => {
             const url = await getEquippedImagePath(fileName);
             return {
               url,
-              zIndex: fileName.includes('head') ? 0 : 1,
+              zIndex: fileName.includes('head') || fileName.includes('face') ? 0 : 1,
             };
           })
         );
